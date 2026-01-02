@@ -9,6 +9,12 @@ public static class HttpContextExtensions
         return httpContext.Request.Query[name].FirstOrDefault();
     }
 
+    public static string? GetFormParam(this HttpContext httpContext, string name)
+    {
+        if (!httpContext.Request.HasFormContentType) return null;
+        return httpContext.Request.Form[name].FirstOrDefault();
+    }
+
     public static IEnumerable<string> GetQueryParamValues(this HttpContext httpContext, string name)
     {
         return httpContext.Request.Query[name]
@@ -19,6 +25,7 @@ public static class HttpContextExtensions
     public static string? GetRequestApiKey(this HttpContext httpContext)
     {
         return httpContext.Request.Headers["x-api-key"].FirstOrDefault()
-            ?? httpContext.GetQueryParam("apikey");
+            ?? httpContext.GetQueryParam("apikey")
+            ?? httpContext.GetFormParam("apikey");
     }
 }

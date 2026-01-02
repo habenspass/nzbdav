@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using NzbWebDAV.Api.SabControllers.AddFile;
 using NzbWebDAV.Api.SabControllers.AddUrl;
+using NzbWebDAV.Api.SabControllers.GetCats;
 using NzbWebDAV.Api.SabControllers.GetConfig;
 using NzbWebDAV.Api.SabControllers.GetFullStatus;
 using NzbWebDAV.Api.SabControllers.GetHistory;
@@ -64,13 +65,17 @@ public class SabApiController(
 
     public BaseController GetController()
     {
-        switch (HttpContext.GetQueryParam("mode"))
+        var mode = HttpContext.GetQueryParam("mode") ?? HttpContext.GetFormParam("mode");
+        switch (mode)
         {
             case "version":
                 return new GetVersionController(
                     HttpContext, configManager);
             case "get_config":
                 return new GetConfigController(
+                    HttpContext, configManager);
+            case "get_cats":
+                return new GetCatsController(
                     HttpContext, configManager);
             case "fullstatus":
                 return new GetFullStatusController(
@@ -81,11 +86,11 @@ public class SabApiController(
             case "addurl":
                 return new AddUrlController(
                     HttpContext, dbClient, queueManager, configManager, websocketManager);
-
             case "queue" when HttpContext.GetQueryParam("name") == "delete":
                 return new RemoveFromQueueController(
                     HttpContext, dbClient, queueManager, configManager, websocketManager);
             case "queue":
+            case "status":
                 return new GetQueueController(
                     HttpContext, dbClient, queueManager, configManager);
 
